@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--This is a Reload version 2.5.6 SCORM 1.2 Content Package document-->
+<!--Spawned from the Reload Content Package Generator - http://www.reload.ac.uk-->
+<manifest xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2" xmlns:imsmd="http://www.imsglobal.org/xsd/imsmd_rootv1p2p1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2" identifier="MANIFEST-6C20470C4713F1CA352F3C2975396BF4" xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd http://www.imsglobal.org/xsd/imsmd_rootv1p2p1 imsmd_rootv1p2p1.xsd http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd">
+  <organizations default="ORG-CDE4C53333A1212A56A1E6B7DF5BD969">
+    <organization identifier="ORG-CDE4C53333A1212A56A1E6B7DF5BD969" structure="hierarchical">
+      <title>cuestionario</title>
+      <item identifier="ITEM-82DE3B2387CACD0963DBB75EA02653A0" isvisible="true" identifierref="RES-0903D2B90B458E2F303A2F0F407AF831">
+        <title>Cuestionario</title>
+      </item>
+    </organization>
+  </organizations>
+  <resources>
+    <resource identifier="RES-0903D2B90B458E2F303A2F0F407AF831" type="webcontent" href="index.html" adlcp:scormtype="sco">
+      <file href="index.html" />
+      <file href="css/style.css" />
+      <file href="css/sweetalert.css" />
+      <file href="js/main.js" />
+      <file href="js/SCORM_API_wrapper.js" />
+      <file href="js/SCOTypes.js" />
+      <file href="js/sweetalert.min.js" />
+    </resource>
+  </resources>
+</manifest>
+
