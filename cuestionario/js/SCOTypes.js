@@ -30,12 +30,13 @@ var Question = (function($){
 
 			switch (this.type){
 	            case Question.QUESTION_TYPE_CHOICE:
-	            	$answers = $("<div>",{class:'answers'}); 
+	            	$answers = $("<div>",{class:'answers'});
 	            	//Pregunta del elección múltiple
 	            	for(var i = 0,len = this.answers.length; i < len; i++){
 	            		var idAnswer = this.id+"_answer_"+i;
 	            		$("<div>",{class:'answer'}).append(
 	            			$("<input>",{id:idAnswer,type:'radio',name:'answers',value:i}),
+	            			$("<span>"),
 	            			$("<label>",{'for':idAnswer,text:this.answers[i].text})
 	                    ).appendTo($answers);
 	            	}
@@ -56,7 +57,7 @@ var Question = (function($){
 		}else{
 			$container.children("#"+this.id).show().siblings().hide();
 		}
-		
+
 	};
 	//Comprueba si se ha contestado correctamente.
 	Question.prototype.check = function() {
@@ -120,7 +121,7 @@ var Test = (function($){
         		confirmButtonText: "Si",
         		cancelButtonText: "No",
         		closeOnConfirm: false,
-        		closeOnCancel: true 
+        		closeOnCancel: true
         	}, function(isConfirm){
         		if (isConfirm){
         			//si hay un bookmark almacenado, preguntamos al usuario para reanudar desde la pregunta anterior
@@ -130,8 +131,8 @@ var Test = (function($){
 
         		typeof(callback) == "function" && callback(question);
         	});
-            
-  
+
+
         }else{
         	typeof(callback) == "function" && callback(question);
         }
@@ -142,10 +143,10 @@ var Test = (function($){
         ScormProcessSetValue("cmi.score.raw", score);
         ScormProcessSetValue("cmi.score.min", "0");
         ScormProcessSetValue("cmi.score.max", "100");
-        
+
         var scaledScore = score / 100;
         ScormProcessSetValue("cmi.score.scaled", scaledScore);
-        
+
         //consider 70% to be passing
         if (score >= 70){
             ScormProcessSetValue("cmi.success_status", "passed");
@@ -184,13 +185,13 @@ var Test = (function($){
 			},function(){
 				self.goTo(++current);
 			});
-			
+
 		}else{
 
 			this.container.find("input:radio").removeAttr("checked");
 			this.container.parent().trigger("reset_question");
 			swal("Respuesta Incorrecta!", answer.feedback, "error");
-			
+
 		}
 	};
 
@@ -228,11 +229,11 @@ var Test = (function($){
 		        }
         	});
         }else{
-        	
+
         	self.goTo(0);
         }
     };
-    
+
     //Permite salir del test
     Test.prototype.exit = function() {
     	var status = scorm.GetSuccessStatus();
@@ -253,19 +254,19 @@ var Test = (function($){
 	   			if (isConfirm) {
 	   				scorm.SetExit("suspend");
 					saveElapsedTime();
-					scorm.save();   
+					scorm.save();
 		   			swal("Guardado!", "Su progreso se ha guardado con éxito", "success");
-		   			scorm.quit(); 
+		   			scorm.quit();
 	   			}else{
 	   				scorm.SetExit("");
 	   				scorm.quit();
 	   			}
-				
+
 	   		});
 
 	   	}
 
-	   	
+
     };
 
 	return Test;
