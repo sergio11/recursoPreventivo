@@ -286,6 +286,7 @@ form{
 .actions {
   width: 100%;
 }
+/*
 #exit, input[type=submit]{
   border: medium none;
   font-family: inherit;
@@ -345,6 +346,34 @@ input[type=submit]:hover{
   box-shadow: 0px 6px #C38300;
 }
 
+*/
+
+#exit, input[type=submit] {
+    display: inline-block;
+    vertical-align: middle;
+    background-color: transparent;
+    color: #5B8727;
+    border: 1px solid #5B8727;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+    padding: 10px;
+    transition: all 0.3s ease;
+    width: auto;
+    min-width: 100px;
+    margin: 10px;
+}
+
+#exit:hover, input[type=submit]:hover{
+  background-color: rgba(91, 135, 39, 0.07);
+}
+
+.actions input:disabled:hover, .actions input:disabled{
+  background-color: #F4F4F4 !important;
+  border: 1px solid rgba(75, 75, 75, 0.44) !important;
+  color: rgba(75, 75, 75, 0.44) !important;
+}
+
 
 /* Radiobuttons  */
 .answers{
@@ -354,7 +383,7 @@ input[type=submit]:hover{
   border-bottom: 2px solid rgb(65, 133, 197);
   border-top: 2px solid rgb(65, 133, 197);
   */
-  border-bottom: 2px solid #70B347; /* green */
+  /* border-bottom: 2px solid #70B347;*/ /* green */
   border-top: 2px solid #70B347; /* green */
 
   padding-bottom: 20px;

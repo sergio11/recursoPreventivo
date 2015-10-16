@@ -696,7 +696,7 @@ h2{
 
 /* animation */
 
-.content, .navigation-button{
+.content, .navigation-button, .btn-group .btn{
   -webkit-animation-duration: 1s;
   animation-duration: 1s;
   -webkit-animation-fill-mode: both;
@@ -770,11 +770,11 @@ h2{
 /* animation Buttons */
 
 
-@-webkit-keyframes fadeInDown {
+@-webkit-keyframes fadeInUp {
   from {
     opacity: 0;
-    -webkit-transform: translate3d(0, -100%, 0);
-    transform: translate3d(0, -100%, 0);
+    -webkit-transform: translate3d(0, 100%, 0);
+    transform: translate3d(0, 100%, 0);
   }
 
   to {
@@ -784,11 +784,11 @@ h2{
   }
 }
 
-@keyframes fadeInDown {
+@keyframes fadeInUp {
   from {
     opacity: 0;
-    -webkit-transform: translate3d(0, -100%, 0);
-    transform: translate3d(0, -100%, 0);
+    -webkit-transform: translate3d(0, 100%, 0);
+    transform: translate3d(0, 100%, 0);
   }
 
   to {
@@ -798,7 +798,28 @@ h2{
   }
 }
 
-.navigation-button {
-  -webkit-animation-name: fadeInDown;
-  animation-name: fadeInDown;
+.navigation-button, .btn-group .btn {
+  -webkit-animation-name: fadeInUp;
+  animation-name: fadeInUp;
+}
+
+
+
+
+.btn-group .btn {
+    display: inline-block;
+    vertical-align: middle;
+    background-color: transparent;
+    color: #5B8727;
+    border: 1px solid #5B8727;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+    padding: 10px;
+    transition: all 0.3s ease;
+}
+
+
+.btn-group .btn:hover{
+    background-color: rgba(91, 135, 39, 0.07);
 }

@@ -931,6 +931,7 @@ body.stop-scrolling {
     transform: translateY(145%); } }
 
 /* 15/10/2015 */
+/*
 .sweet-alert button, .sweet-alert button:focus{
   font-family: inherit;
   font-size: inherit;
@@ -975,4 +976,25 @@ body.stop-scrolling {
   background-color: #C1C1C1;
   box-shadow: 0px 4px #868686 !important;
   top: 2px !important;
+}
+*/
+
+.sweet-alert button, .sweet-alert button:focus, .sweet-alert button.cancel, .sweet-alert button.cancel:focus, .sweet-alert button.cancel:active {
+    display: inline-block;
+    vertical-align: middle;
+    background-color: transparent;
+    color: #5B8727;
+    border: 1px solid #5B8727;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+    padding: 10px;
+    transition: all 0.3s ease;
+    width: auto;
+    min-width: 100px;
+    margin: 10px;
+}
+
+.sweet-alert button.confirm:hover, .sweet-alert button.cancel:hover{
+  background-color: rgba(91, 135, 39, 0.07);
 }
