@@ -61,7 +61,7 @@ var Question = (function($){
 	//Comprueba si se ha contestado correctamente.
 	Question.prototype.check = function() {
 		var checked = $("#"+this.id + ' input:radio:checked').val();
-		var error = this.correctAnswer == parseInt(checked);
+		var error = this.correctAnswer != parseInt(checked);
 		var feedback = this.answers[checked].feedback;
 		return {
 			error:error,
@@ -158,16 +158,14 @@ var Test = (function($){
 	//Carga una pregunta indetificada por su id.
 	Test.prototype.goTo = function(i) {
 		if(this.questions[i]){
+			//Guardamos el índice de la pregunta actual.
+			current = i;
 			this.questions[i].renderTo(this.container);
 			//Guardamos la pregunta actual en el CMI datamodel.
 			scorm.set("cmi.suspend_data",i);
 			//Actualizamos Barra de Progreso.
 			$checkoutBar.children().eq(i).addClass("active").prev().addClass("visited");
 			this.container.parent().trigger("new_question");
-			current = i;
-		}else{
-			scorm.SetSuccessStatus("passed");
-			this.exit();
 		}
 	};
 
@@ -175,14 +173,31 @@ var Test = (function($){
 	Test.prototype.next = function() {
 		//Comprobamos si la pregunta actual es correcta.
 		var answer = this.questions[current].check();
-		if (answer.error) {
+
+		if (!answer.error) {
+			//Permite saber si es la última pregunta.
+			var last_question = current >= Object.keys(self.questions).length - 1;
 
 			swal({
 				title: "Respuesta Correcta!",
 				text: answer.feedback,
-				type: "success"
+				type: "success",
+				closeOnConfirm: !last_question,
 			},function(){
-				self.goTo(++current);
+				//Comprobamos si es la última pregunta.
+				if (!last_question) {
+					self.goTo(++current);
+				}else{
+
+					swal({
+						title: "Test Finalizado!",
+						text: "Felicidades, has finalizado el test.",
+						imageUrl: "imagenes/thumbs-up.jpg" 
+					});
+
+					scorm.SetSuccessStatus("passed");
+					this.exit();
+				}
 			});
 			
 		}else{
@@ -218,7 +233,6 @@ var Test = (function($){
         //Mediante el valor de entry, sabremos si el usuario está iniciado la OCS por primera vez
         // o si está retomando un intento previo.
         var entry = scorm.data.get("cmi.core.entry");
-        alert("Este es el valor de entry : " + entry);
         if (entry == "resume") {
         	getBookMark(function(question){
 	        	if (question) {
