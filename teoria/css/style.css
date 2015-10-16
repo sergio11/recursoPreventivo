@@ -9,7 +9,7 @@
  */
 
 html {
-  font-family: sans-serif; /* 1 */
+  font-family: arial, sans-serif; /* 1 */
   -ms-text-size-adjust: 100%; /* 2 */
   -webkit-text-size-adjust: 100%; /* 2 */
 }
@@ -449,6 +449,7 @@ body {
   line-height: 1.42857143;
   color: #333;
   font-weight: 300;
+  /*
   background: rgba(202,255,41,1);
   background: -moz-linear-gradient(-45deg, rgba(202,255,41,1) 0%, rgba(48,92,7,1) 100%);
   background: -webkit-gradient(left top, right bottom, color-stop(0%, rgba(202,255,41,1)), color-stop(100%, rgba(48,92,7,1)));
@@ -458,12 +459,14 @@ body {
   background: linear-gradient(135deg, rgba(202,255,41,1) 0%, rgba(48,92,7,1) 100%);
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#caff29', endColorstr='#305c07', GradientType=1 );
   background-repeat: no-repeat;
-	background-size: cover;
+  background-size: cover;
+  */
 }
 
 h1,h2,h3,a{
   /*Tipografía para encabezados y enlaces*/
-  font-family: 'Josefin Sans', sans-serif;
+  /* font-family: 'Josefin Sans', sans-serif; */
+  font-weight: normal;
 }
 /*Estilos para el texto seleccionado*/
 ::selection {
@@ -501,7 +504,7 @@ header hgroup h2{
 }
 
 header hgroup h1{
-	font-weight: 900;
+ /* 	font-weight: 900; */
 }
 
 header .iberdrola{
@@ -554,10 +557,10 @@ footer{
 .navigation-button span{
 	display: inline-block;
 	width: 100%;
-	background-color: #fff;
+	/* background-color: #fff;*/
 	pointer-events:none;
 }
-
+/*
 .navigation-button.navigation-button-prev:hover{
 	-webkit-transform:rotateX(360deg) translateX(-70px);
 	-moz-transform:rotateX(360deg) translateX(-70px);
@@ -569,8 +572,9 @@ footer{
 	-moz-transform:rotateX(360deg) translateX(70px);
 	transform:rotateX(360deg) translateX(70px);
 }
+*/
 
-
+/*
 .navigation-button.navigation-button-prev::before,
 .navigation-button.navigation-button-next::after{
 	content: ' ';
@@ -591,6 +595,7 @@ footer{
   	border-left:30px solid #fff;
   	top: 0;left:100%;
 }
+*/
 
 .btn-group{
   display: inline-block;
@@ -622,11 +627,178 @@ main{
 	background-color: rgba(255,255,255,0.8);
 	box-shadow: #fff 0px 0px 5px 4px;
 	position: relative;
-	height: 700px;
   overflow: hidden;
   padding-top: 1px;
   margin-top: 1rem;
 }
 
+/* 15/10/2015 */
+body{
+  font-family: arial;
+  background-color: rgba(170, 183, 26, 0.2);
+  background-image: url(../img/bg.png);
+  background-position: left bottom;
+  background-repeat: no-repeat;
+}
+
+.content{
+  box-shadow: none;
+  border-radius: 0px;
+  background-color: rgba(255,255,255,0.5);
+}
+
+.iberdrola{
+  text-align: right;
+}
+
+h1{
+  color: #5C871A;
+}
+
+h2{
+  color: #86A54F;
+}
+
+.navigation-button-next{
+  background-image: url(../img/next.png);
+  background-repeat: no-repeat;
+  background-size: 60px;
+}
+
+.navigation-button-prev{
+  background-image: url(../img/prev.png);
+  background-repeat: no-repeat;
+  background-size: 60px;
+}
+
+.navigation-button{
+  font-weight: normal;
+  transition: all 0.3s ease;
+}
+
+.navigation-button:hover{
+  opacity: 0.8;
+  filter:alpha(opacity=80);
+  -moz-opacity:0.8;
+  -khtml-opacity: 0.8;
+}
+
+.navigation-button span{
+  margin-left: 40px;
+  color: #5C871A;
+  font-size: 16px;
+}
+
+.content{
+  padding: 50px;
+  min-height: 500px;
+}
+
+/* animation */
+
+.content, .navigation-button{
+  -webkit-animation-duration: 1s;
+  animation-duration: 1s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+
+.navigation-button{
+  -webkit-animation-duration: 1.3s;
+  animation-duration: 1.3s;
+}
+
+/* animation content */
+@-webkit-keyframes slideInLeft {
+  from {
+    -webkit-transform: translate3d(-100%, 0, 0);
+    transform: translate3d(-100%, 0, 0);
+    visibility: visible;
+  }
+
+  to {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    -webkit-transform: translate3d(-100%, 0, 0);
+    transform: translate3d(-100%, 0, 0);
+    visibility: visible;
+  }
+
+  to {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.content {
+  -webkit-animation-name: slideInLeft;
+  animation-name: slideInLeft;
+}
 
 
+.content.infinite {
+  -webkit-animation-iteration-count: infinite;
+  animation-iteration-count: infinite;
+}
+
+.content.hinge {
+  -webkit-animation-duration: 2s;
+  animation-duration: 2s;
+}
+
+.content.bounceIn,
+.content.bounceOut {
+  -webkit-animation-duration: .75s;
+  animation-duration: .75s;
+}
+
+.content.flipOutX,
+.content.flipOutY {
+  -webkit-animation-duration: .75s;
+  animation-duration: .75s;
+}
+
+
+
+
+
+/* animation Buttons */
+
+
+@-webkit-keyframes fadeInDown {
+  from {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -100%, 0);
+    transform: translate3d(0, -100%, 0);
+  }
+
+  to {
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none;
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -100%, 0);
+    transform: translate3d(0, -100%, 0);
+  }
+
+  to {
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none;
+  }
+}
+
+.navigation-button {
+  -webkit-animation-name: fadeInDown;
+  animation-name: fadeInDown;
+}
