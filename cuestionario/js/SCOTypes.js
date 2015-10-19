@@ -1,5 +1,5 @@
 var Question = (function($){
-	
+
 	var self;
 	var score_question = 1;
 
@@ -194,6 +194,8 @@ var Test = (function($){
 			text: "Felicidades, has finalizado el test con una puntación de : " + scaled_score + "%",
 			imageUrl: "imagenes/thumbs-up.jpg" 
 		});
+
+		self.container.trigger("test_ended");
 
 		//scorm.SetSuccessStatus("passed");
 		//self.exit();

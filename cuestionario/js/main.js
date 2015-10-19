@@ -157,11 +157,12 @@
 			e.stopPropagation();
 			//Corregimos respuesta.
 			test.checkQuestion();
-			
 		}).on("change",function(){
 			$(this).find(":submit").removeAttr('disabled');
 		}).on("new_question reset_question",function(){
 			$(this).find(":submit").attr('disabled','disabled');
+		}).on("test_ended",function(){
+			$(this).hide();
 		});
 
 		$("#exit").on("click",function(e){
