@@ -106,6 +106,10 @@ var Question = (function($){
 		return this.fails < (this.answers.length - 1) ? score_question - (this.fails * (score_question / (this.answers.length - 1))) : 0;
 	};
 
+	/*
+		Si el número de fallos es igual o superior al número de respuestas menos 1, la pregunta no puntua.
+		Cada fallo restará del total (1 punto) su parte proporcional.
+	*/
 
 	return Question;
 

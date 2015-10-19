@@ -199,6 +199,7 @@ ul.checkout-bar a {
     display: flex;
     justify-content: space-around;
   }
+  
   ul.checkout-bar:before {
     background-size: 35px 35px;
     background-color: #57aed1;
@@ -213,6 +214,7 @@ ul.checkout-bar a {
     position: absolute;
     width: 10%;
   }
+
   ul.checkout-bar li {
     display: inline-block;
     margin: 50px 0 0;
