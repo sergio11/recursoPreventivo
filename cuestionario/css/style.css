@@ -351,6 +351,11 @@ input[type=submit]:hover{
     width: auto;
     min-width: 100px;
     margin: 10px;
+
+}
+
+input[type=submit]{
+    min-width: 122px;
 }
 
 #exit:hover, input[type=submit]:hover{
@@ -544,6 +549,9 @@ ul.checkout-bar li.active:last-child::after{
   animation-duration: 1s;
   -webkit-animation-fill-mode: both;
   animation-fill-mode: both;
+
+  -webkit-animation-delay: 2s !important; /* Chrome, Safari, Opera */
+  animation-delay: 2s !important;
 }
 
 @-webkit-keyframes slideInLeft {
