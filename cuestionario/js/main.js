@@ -155,7 +155,8 @@
 		$("#test").on("submit",function(e){
 			e.preventDefault();
 			e.stopPropagation();
-			test.next();
+			//Corregimos respuesta.
+			test.checkQuestion();
 			
 		}).on("change",function(){
 			$(this).find(":submit").removeAttr('disabled');

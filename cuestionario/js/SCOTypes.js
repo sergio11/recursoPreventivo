@@ -1,21 +1,32 @@
 var Question = (function($){
+	
 	var self;
+	var score_question = 1;
 
 	function Question(data){
+
 		this.id = data.id;
         this.statement = data.statement;
         this.img = data.img;
         this.type = data.type;
         this.answers = data.answers || [];
         this.correctAnswer = data.correctAnswer || 0;
-        //this.ObjectiveId = objectiveId;
+        this.fails = 0;
+        this.totalTimeAllowed = data.totalTimeAllowed || 0;
+        this.startTime = 0;
+        this.totalTime = 0;
+        this.$view = null;
 	}
+
 	//Constantes de clase.
 	Question.QUESTION_TYPE_CHOICE = "choice";
     Question.QUESTION_TYPE_TF = "true-false";
     Question.QUESTION_TYPE_NUMERIC = "numeric";
+
 	//Muestra la pregunta en un contendor indicado.
 	Question.prototype.renderTo = function($container) {
+
+		this.startTime = new Date().getTime();
 
 		if (!$container.children("#"+this.id).length) {
 
@@ -53,20 +64,45 @@ var Question = (function($){
         	//Mostramos la pregunta.
         	$container.children().hide().end().append($question);
 
+        	this.$view = $question;
+
 		}else{
 			$container.children("#"+this.id).show().siblings().hide();
 		}
 		
 	};
-	//Comprueba si se ha contestado correctamente.
-	Question.prototype.check = function() {
+
+	Question.prototype.getCheckedAnswerFeedback = function() {
 		var checked = $("#"+this.id + ' input:radio:checked').val();
-		var error = this.correctAnswer != parseInt(checked);
-		var feedback = this.answers[checked].feedback;
-		return {
-			error:error,
-			feedback:feedback
+		return this.answers[checked].feedback;
+	};
+
+
+	//Comprueba si se ha contestado correctamente.
+	Question.prototype.isCorrect = function() {
+		var checked = $("#"+this.id + ' input:radio:checked').val();
+		var error = false;
+		if (this.correctAnswer != parseInt(checked)) {
+			error = true;
+			this.fails += 1;
 		}
+		return !error;
+	};
+
+	Question.prototype.finish = function() {
+		this.totalTime = new Date().getTime() - this.startTime;
+	};
+
+	Question.prototype.reset = function() {
+		//Desmarcamos respuestas para este pregunta.
+		this.$view.find("input:radio").removeAttr("checked");
+		//Notificamos al formulario que la pregunta fue reseteada.
+		this.$view.parent().trigger("reset_question");
+	};
+
+	//Devuelve puntuación para esta pregunta.
+	Question.prototype.getScore = function() {
+		return this.fails < (this.answers.length - 1) ? score_question - (this.fails * (score_question / (this.answers.length - 1))) : 0;
 	};
 
 
@@ -137,6 +173,50 @@ var Test = (function($){
         }
 	}
 
+	var saveScore = function(){
+
+		var total_score = 0;
+		self.questions.forEach(function(question){
+			total_score += question.getScore();
+		});
+
+		//maximum value in the range
+		scorm.SetScoreMax(self.questions.length);
+		//minimum value in the range
+		scorm.SetScoreMin(0);
+		//Identifies the learner’s score for the SCO.
+		scorm.SetScoreRaw(total_score);
+        
+        var scaled_score = Math.round(total_score / self.questions.length * 100);
+		console.log("Scaled Score : " + scaled_score);
+		swal({
+			title: "Test Finalizado!",
+			text: "Felicidades, has finalizado el test con una puntación de : " + scaled_score + "%",
+			imageUrl: "imagenes/thumbs-up.jpg" 
+		});
+
+		//scorm.SetSuccessStatus("passed");
+		//self.exit();
+
+
+	}
+
+	var createcheckoutBar = function(){
+		var $fragment = $(document.createDocumentFragment());
+		for (var i = 1,len = self.questions.length; i <= len; i++) {
+			$fragment.append(
+				$("<li>").append(
+					$("<span>",{text:i})
+				)
+			)
+		}
+		$checkoutBar.append($fragment).children(":eq(0)").addClass("first");
+	}
+
+	var isLastQuestion = function() {
+		return current >= Object.keys(self.questions).length - 1;
+	};
+
 
 	/*var recordTest = function(score){
         ScormProcessSetValue("cmi.score.raw", score);
@@ -160,57 +240,53 @@ var Test = (function($){
 		if(this.questions[i]){
 			//Guardamos el índice de la pregunta actual.
 			current = i;
+			//Renderizamos pregunta en el contenedor.
 			this.questions[i].renderTo(this.container);
 			//Guardamos la pregunta actual en el CMI datamodel.
 			scorm.set("cmi.suspend_data",i);
 			//Actualizamos Barra de Progreso.
-			$checkoutBar.children().eq(i).addClass("active").prev().addClass("visited");
+			$checkoutBar.children().eq(i).addClass("active").prevAll().addClass("visited");
 			this.container.parent().trigger("new_question");
 		}
 	};
 
-	//Avanza a la siguiente pregunta.
-	Test.prototype.next = function() {
+	
+
+	Test.prototype.checkQuestion = function() {
+
+		var question = this.questions[current];
 		//Comprobamos si la pregunta actual es correcta.
-		var answer = this.questions[current].check();
-
-		if (!answer.error) {
+		if (question.isCorrect()) {
 			//Permite saber si es la última pregunta.
-			var last_question = current >= Object.keys(self.questions).length - 1;
-
+			var last_question = isLastQuestion();
+			
 			swal({
 				title: "Respuesta Correcta!",
-				text: answer.feedback,
+				text: question.getCheckedAnswerFeedback(),
 				type: "success",
 				closeOnConfirm: !last_question,
 			},function(){
 				//Comprobamos si es la última pregunta.
 				if (!last_question) {
-					self.goTo(++current);
+					self.next();
 				}else{
-
-					swal({
-						title: "Test Finalizado!",
-						text: "Felicidades, has finalizado el test.",
-						imageUrl: "imagenes/thumbs-up.jpg" 
-					});
-
-					scorm.SetSuccessStatus("passed");
-					this.exit();
+					saveScore();
 				}
 			});
-			
-		}else{
 
-			this.container.find("input:radio").removeAttr("checked");
-			this.container.parent().trigger("reset_question");
-			swal("Respuesta Incorrecta!", answer.feedback, "error");
-			
+		}else{
+			swal("Respuesta Incorrecta!", question.getCheckedAnswerFeedback(), "error");
+			question.reset();
 		}
 	};
 
+	//Avanza a la siguiente pregunta.
+	Test.prototype.next = function() {
+		this.goTo(++current);	
+	};
+
 	Test.prototype.prev = function() {
-		this.questions[--current].renderTo(this.container);
+		this.goTo(--current);
 	};
 
 	Test.prototype.addQuestion = function(question){
@@ -221,6 +297,8 @@ var Test = (function($){
 
     //Inicia el test.
     Test.prototype.start = function() {
+    	//Creamos la barra de progreso.
+    	createcheckoutBar();
     	//Iniciamos sesión de comunicación con el LMS.
     	scorm.init();
     	var status = scorm.GetCompletionStatus();
@@ -245,6 +323,9 @@ var Test = (function($){
         	
         	self.goTo(0);
         }
+
+
+
     };
     
     //Permite salir del test
@@ -278,8 +359,6 @@ var Test = (function($){
 	   		});
 
 	   	}
-
-	   	
     };
 
 	return Test;
