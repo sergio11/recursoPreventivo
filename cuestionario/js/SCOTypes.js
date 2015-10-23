@@ -4,24 +4,62 @@ var Question = (function($){
 	var score_question = 1;
 
 	function Question(data){
-
+		self = this;
 		this.id = data.id;
-        this.statement = data.statement;
-        this.img = data.img;
-        this.type = data.type;
-        this.answers = data.answers || [];
-        this.correctAnswer = data.correctAnswer || 0;
-        this.fails = 0;
-        this.totalTimeAllowed = data.totalTimeAllowed || 0;
-        this.startTime = 0;
-        this.totalTime = 0;
-        this.$view = null;
+  	this.statement = data.statement;
+  	this.img = data.img;
+  	this.type = data.type;
+    this.answers = data.answers || [];
+    this.fails = 0;
+    this.totalTimeAllowed = data.totalTimeAllowed || 0;
+  	this.startTime = 0;
+    this.totalTime = 0;
+    this.$view = null;
 	}
 
 	//Constantes de clase.
 	Question.QUESTION_TYPE_CHOICE = "choice";
-    Question.QUESTION_TYPE_TF = "true-false";
-    Question.QUESTION_TYPE_NUMERIC = "numeric";
+  Question.QUESTION_TYPE_TF = "true-false";
+  Question.QUESTION_TYPE_NUMERIC = "numeric";
+
+	Question.prototype._findAnswer = function (id) {
+		  var answer = null;
+		  if (this.answers instanceof Array) {
+		    var idx = this.answers.map(function(object){
+		      return object['id'];
+		    }).indexOf(parseInt(id));
+		    answer =  idx >= 0 ? this.answers[idx] : null;
+		  }
+		  return answer;
+	}
+
+	Question.prototype._renderAnswersTo = function($question) {
+		switch (this.type){
+			case Question.QUESTION_TYPE_CHOICE:
+					var $fragment = $(document.createDocumentFragment());
+					//Ordenamos aleatoriamente las respuestas.
+					this.answers = shuffle(this.answers);
+					//Pregunta del elección múltiple
+					for(var i = 0,len = this.answers.length; i < len; i++){
+							var idAnswer = this.id+"_answer_"+i;
+							$("<div>",{class:'answer'}).append(
+									$("<input>",{id:idAnswer,type:'radio',name:'answers',value:this.answers[i].id}),
+									$("<span>"),
+									$("<label>",{'for':idAnswer,text:this.answers[i].text})
+							).appendTo($fragment);
+					}
+					$question.find(".answers").empty().append($fragment);
+					break;
+			case Question.QUESTION_TYPE_TF:
+					break;
+			case Question.QUESTION_TYPE_NUMERIC:
+					break;
+			default:
+					throw new Error("Invalid type question");
+			break;
+		}
+
+	}
 
 	//Muestra la pregunta en un contendor indicado.
 	Question.prototype.renderTo = function($container) {
@@ -30,43 +68,20 @@ var Question = (function($){
 
 		if (!$container.children("#"+this.id).length) {
 
-			$question = $("<div>",{id:this.id}).append(
-				$("<figure>",{class:'figure'}).append(
-					$("<div>",{class:'photo'}).append(
-						$("<img>",{src:'imagenes/'+this.img})
-					),
-					$("<figcaption>",{class:'desc',text:this.statement})
-				)
-			);
+					var $question = $("<div>",{id:this.id}).append(
+						$("<figure>",{class:'figure'}).append(
+							$("<div>",{class:'photo'}).append(
+								$("<img>",{src:'imagenes/'+this.img})
+							),
+							$("<figcaption>",{class:'desc',text:this.statement})
+						),
+						$("<div>",{class:'answers'})
+					);
 
-			switch (this.type){
-	            case Question.QUESTION_TYPE_CHOICE:
-	            	$answers = $("<div>",{class:'answers'});
-	            	//Pregunta del elección múltiple
-	            	for(var i = 0,len = this.answers.length; i < len; i++){
-	            		var idAnswer = this.id+"_answer_"+i;
-	            		$("<div>",{class:'answer'}).append(
-	            			$("<input>",{id:idAnswer,type:'radio',name:'answers',value:i}),
-	            			$("<span>"),
-	            			$("<label>",{'for':idAnswer,text:this.answers[i].text})
-	                    ).appendTo($answers);
-	            	}
-
-	            	$answers.appendTo($question);
-	            	break;
-	            case Question.QUESTION_TYPE_TF:
-	            	break;
-	            case Question.QUESTION_TYPE_NUMERIC:
-	            	break;
-	            default:
-	                throw new Error("Invalid type question");
-	                break;
-        	}
+					this._renderAnswersTo($question);
+					this.$view = $question;
         	//Mostramos la pregunta.
         	$container.children().hide().end().append($question);
-
-        	this.$view = $question;
-
 		}else{
 			$container.children("#"+this.id).show().siblings().hide();
 		}
@@ -74,16 +89,18 @@ var Question = (function($){
 	};
 
 	Question.prototype.getCheckedAnswerFeedback = function() {
-		var checked = $("#"+this.id + ' input:radio:checked').val();
-		return this.answers[checked].feedback;
+		var id = $("#"+this.id + ' input:radio:checked').val();
+		var answer = this._findAnswer(id);
+		return answer.feedback;
 	};
 
 
 	//Comprueba si se ha contestado correctamente.
 	Question.prototype.isCorrect = function() {
-		var checked = $("#"+this.id + ' input:radio:checked').val();
+		var id = $("#"+this.id + ' input:radio:checked').val();
+		var answer = this._findAnswer(id);
 		var error = false;
-		if (this.correctAnswer != parseInt(checked)) {
+		if (!answer.correct) {
 			error = true;
 			this.fails += 1;
 		}
@@ -95,10 +112,10 @@ var Question = (function($){
 	};
 
 	Question.prototype.reset = function() {
-		//Desmarcamos respuestas para este pregunta.
-		this.$view.find("input:radio").removeAttr("checked");
+		var $question = this.$view;
+		this._renderAnswersTo($question);
 		//Notificamos al formulario que la pregunta fue reseteada.
-		this.$view.parent().trigger("reset_question");
+		$question.parent().trigger("reset_question");
 	};
 
 	//Devuelve puntuación para esta pregunta.
@@ -168,11 +185,8 @@ var Test = (function($){
         			question = parseInt(bookmark, 10);
         			swal("Restaurada !", "Su sesión fue restaurada", "success");
         		}
-
         		typeof(callback) == "function" && callback(question);
         	});
-
-
         }else{
         	typeof(callback) == "function" && callback(question);
         }
@@ -191,21 +205,17 @@ var Test = (function($){
 		scorm.SetScoreMin(0);
 		//Identifies the learner’s score for the SCO.
 		scorm.SetScoreRaw(total_score);
-        
-        var scaled_score = Math.round(total_score / self.questions.length * 100);
+
+  	var scaled_score = Math.round(total_score / self.questions.length * 100);
 		console.log("Scaled Score : " + scaled_score);
 		swal({
 			title: "Test Finalizado!",
 			text: "Felicidades, has finalizado el test con una puntación de : " + scaled_score + "%",
-			imageUrl: "imagenes/thumbs-up.jpg" 
+			imageUrl: "imagenes/thumbs-up.jpg"
 		});
-
 		self.container.trigger("test_ended");
-
 		//scorm.SetSuccessStatus("passed");
 		//self.exit();
-
-
 	}
 
 	var createcheckoutBar = function(){
@@ -257,8 +267,6 @@ var Test = (function($){
 		}
 	};
 
-	
-
 	Test.prototype.checkQuestion = function() {
 
 		var question = this.questions[current];
@@ -266,7 +274,7 @@ var Test = (function($){
 		if (question.isCorrect()) {
 			//Permite saber si es la última pregunta.
 			var last_question = isLastQuestion();
-			
+
 			swal({
 				title: "Respuesta Correcta!",
 				text: question.getCheckedAnswerFeedback(),
@@ -289,7 +297,7 @@ var Test = (function($){
 
 	//Avanza a la siguiente pregunta.
 	Test.prototype.next = function() {
-		this.goTo(++current);	
+		this.goTo(++current);
 	};
 
 	Test.prototype.prev = function() {
