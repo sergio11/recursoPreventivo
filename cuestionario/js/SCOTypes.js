@@ -22,6 +22,37 @@ var Question = (function($){
   Question.QUESTION_TYPE_TF = "true-false";
   Question.QUESTION_TYPE_NUMERIC = "numeric";
 
+	Question.prototype._isEqual = function (answers1,answers2) {
+		  var equal = true;
+		  if (answers1 instanceof Array && answers2 instanceof Array) {
+		    if (answers1.length == answers2.length) {
+		      for (var i = 0,len = answers1.length; i < len; i++) {
+						//Si el tipo o el id no coinciden, el conjunto de preguntras no son iguales.
+		        if ((typeof(answers1[i]) != typeof(answers2[i])) || (answers1[i].id != answers2[i].id)) {
+		          equal = false;
+		          break;
+		        }
+		      }
+		    }else{
+		      equal = false;
+		    }
+		  }else{
+		    equal = false;
+		  }
+		  return equal;
+	};
+
+	//Ordena las respuestas de forma aleatoria.
+	Question.prototype._shuffleAnswers = function () {
+		var answersCopy = this.answers.slice(0);
+		do{
+			answersCopy.sort(function() {
+				return 0.5 - Math.random();
+			});
+		}while(this._isEqual(this.answers,answersCopy));
+		this.answers = answersCopy;
+	};
+
 	Question.prototype._findAnswer = function (id) {
 		  var answer = null;
 		  if (this.answers instanceof Array) {
@@ -38,7 +69,7 @@ var Question = (function($){
 			case Question.QUESTION_TYPE_CHOICE:
 					var $fragment = $(document.createDocumentFragment());
 					//Ordenamos aleatoriamente las respuestas.
-					this.answers = shuffle(this.answers);
+					this._shuffleAnswers();
 					//Pregunta del elección múltiple
 					for(var i = 0,len = this.answers.length; i < len; i++){
 							var idAnswer = this.id+"_answer_"+i;
@@ -77,7 +108,7 @@ var Question = (function($){
 						),
 						$("<div>",{class:'answers'})
 					);
-
+					//Mostramos las respuestas.
 					this._renderAnswersTo($question);
 					this.$view = $question;
         	//Mostramos la pregunta.
