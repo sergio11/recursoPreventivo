@@ -223,32 +223,6 @@ var Test = (function($){
         }
 	}
 
-	var saveScore = function(){
-
-		var total_score = 0;
-		self.questions.forEach(function(question){
-			total_score += question.getScore();
-		});
-
-		//maximum value in the range
-		scorm.SetScoreMax(self.questions.length);
-		//minimum value in the range
-		scorm.SetScoreMin(0);
-		//Identifies the learner’s score for the SCO.
-		scorm.SetScoreRaw(total_score);
-
-  	var scaled_score = Math.round(total_score / self.questions.length * 100);
-		console.log("Scaled Score : " + scaled_score);
-		swal({
-			title: "Test Finalizado!",
-			text: "Felicidades, has finalizado el test con una puntación de : " + scaled_score + "%",
-			imageUrl: "imagenes/thumbs-up.jpg"
-		});
-		self.container.trigger("test_ended");
-		//scorm.SetSuccessStatus("passed");
-		//self.exit();
-	}
-
 	var createcheckoutBar = function(){
 		var $fragment = $(document.createDocumentFragment());
 		for (var i = 1,len = self.questions.length; i <= len; i++) {
@@ -316,7 +290,7 @@ var Test = (function($){
 				if (!last_question) {
 					self.next();
 				}else{
-					saveScore();
+					self.finish();
 				}
 			});
 
@@ -341,71 +315,101 @@ var Test = (function($){
 		};
     }
 
-    //Inicia el test.
-    Test.prototype.start = function() {
-    	//Creamos la barra de progreso.
-    	createcheckoutBar();
-    	//Iniciamos sesión de comunicación con el LMS.
-    	scorm.init();
-    	var status = scorm.GetCompletionStatus();
-    	//it's a best practice to set the completion status to incomplete when
-        //first launching the course (if the course is not already completed)
-        if (status == "unknown"){
-            scorm.SetCompletionStatus("incomplete");
-        }
-        startTimeStamp = new Date();
-        //Mediante el valor de entry, sabremos si el usuario está iniciado la OCS por primera vez
-        // o si está retomando un intento previo.
-        var entry = scorm.data.get("cmi.core.entry");
-        if (entry == "resume") {
-        	getBookMark(function(question){
-	        	if (question) {
-	        		self.goTo(question);
-		        }else{
-		        	self.goTo(0);
-		        }
-        	});
-        }else{
+  //Inicia el test.
+  Test.prototype.start = function() {
+    //Creamos la barra de progreso.
+    createcheckoutBar();
+    //Iniciamos sesión de comunicación con el LMS.
+    scorm.init();
+    var status = scorm.GetCompletionStatus();
+    //it's a best practice to set the completion status to incomplete when
+    //first launching the course (if the course is not already completed)
+    if (status == "unknown"){
+        scorm.SetCompletionStatus("incomplete");
+    }
+    startTimeStamp = new Date();
+    //Mediante el valor de entry, sabremos si el usuario está iniciado la OCS por primera vez
+    // o si está retomando un intento previo.
+    var entry = scorm.data.get("cmi.core.entry");
+    if (entry == "resume") {
+        getBookMark(function(question){
+	      	if (question) {
+	        	self.goTo(question);
+		      }else{
+		        self.goTo(0);
+		      }
+        });
+    }else{
+			self.goTo(0);
+    }
+  };
+	//Finaliza el test guardando puntuación.
+	Test.prototype.finish = function () {
+		var total_score = 0;
+		//Obtiene el score de todas la preguntas.
+		self.questions.forEach(function(question){
+			total_score += question.getScore();
+		});
+		//Configura el valor máximo
+		scorm.SetScoreMax(self.questions.length);
+		//Configura valor mínimo en el rango.
+		scorm.SetScoreMin(0);
+		var scaled_score = Math.round(total_score / self.questions.length * 100);
+		//Guardamos el score obtenido por el estudiante para este SCO.
+		scorm.SetScoreRaw(scaled_score);
+		swal({
+			title: "Test Finalizado!",
+			text: "Felicidades, has finalizado el test con una puntación de : " + scaled_score + "%",
+			imageUrl: "imagenes/thumbs-up.jpg"
+		});
+		self.container.trigger("test_ended");
+		scorm.SetSuccessStatus("passed");
+		saveElapsedTime();
+		scorm.save();
+		scorm.quit();
+	};
 
-        	self.goTo(0);
-        }
+	//Permite salir del test guardando el estado.
+  Test.prototype.exit = function() {
+		swal({
+				title: "¿Estás seguro?",
+				text: "¿Quieres salir del objeto de aprendizaje?",
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonColor: "#DD6B55",
+				confirmButtonText: "Salir",
+				closeOnConfirm: false
+		},function(isConfirm){
 
+			if (isConfirm) {
 
+					swal({
+				   			title: "¿Guardar Progreso?",
+				   			text: "¿Quieres guardar tu progreso?",
+				   			type: "warning",
+				   			showCancelButton: true,
+				   			confirmButtonColor: "#DD6B55",
+				   			confirmButtonText: "Guardar",
+				   			closeOnConfirm: false
+				   	},function(isConfirm){
+				   			//Establecemos cmi.exit a suspend.
+				   			if (isConfirm) {
+				   				scorm.SetExit("suspend");
+									saveElapsedTime();
+									scorm.save();
+					   			swal("Guardado!", "Su progreso se ha guardado con éxito", "success");
+					   			scorm.quit();
+				   			}else{
+				   				scorm.SetExit("");
+				   				scorm.quit();
+				   			}
+								//cerramos la ventana
+								window.close();
 
-    };
-
-    //Permite salir del test
-    Test.prototype.exit = function() {
-    	var status = scorm.GetSuccessStatus();
-    	if(status === "completed"){
-			scorm.SetExit("logout");
-	   	} else {
-
-	   		swal({
-	   			title: "¿Estás seguro?",
-	   			text: "¿Quieres guardar tu progreso?",
-	   			type: "warning",
-	   			showCancelButton: true,
-	   			confirmButtonColor: "#DD6B55",
-	   			confirmButtonText: "Guardar y Salir",
-	   			closeOnConfirm: false
-	   		},function(isConfirm){
-	   			//Establecemos cmi.exit a suspend.
-	   			if (isConfirm) {
-	   				scorm.SetExit("suspend");
-					saveElapsedTime();
-					scorm.save();
-		   			swal("Guardado!", "Su progreso se ha guardado con éxito", "success");
-		   			scorm.quit();
-	   			}else{
-	   				scorm.SetExit("");
-	   				scorm.quit();
-	   			}
-
-	   		});
-
-	   	}
-    };
+				   	});
+				}
+		});
+	};
 
 	return Test;
 
