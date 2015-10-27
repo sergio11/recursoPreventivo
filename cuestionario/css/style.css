@@ -199,7 +199,7 @@ ul.checkout-bar a {
     display: flex;
     justify-content: space-around;
   }
-  
+
   ul.checkout-bar:before {
     background-size: 35px 35px;
     background-color: #57aed1;
@@ -535,17 +535,36 @@ ul.checkout-bar li.active:last-child::after{
 }
 
 
-/* animation content  */
-
-.content{
+/* animation */
+.answer{
   -webkit-animation-duration: 1s;
   animation-duration: 1s;
   -webkit-animation-fill-mode: both;
   animation-fill-mode: both;
 }
 
+.answer:nth-child(2){
+  -webkit-animation-delay: 0.1s !important; /* Chrome, Safari, Opera */
+  animation-delay: 0.1s !important;
+}
+
+.answer:nth-child(3){
+  -webkit-animation-delay: 0.2s !important; /* Chrome, Safari, Opera */
+  animation-delay: 0.2s !important;
+}
+
+.answer:nth-child(4){
+  -webkit-animation-delay: 0.3s !important; /* Chrome, Safari, Opera */
+  animation-delay: 0.3s !important;
+}
+
+.answer:nth-child(5){
+  -webkit-animation-delay: 0.4s !important; /* Chrome, Safari, Opera */
+  animation-delay: 0.4s !important;
+}
+
 .photo{
-    -webkit-animation-duration: 1s;
+  -webkit-animation-duration: 1s;
   animation-duration: 1s;
   -webkit-animation-fill-mode: both;
   animation-fill-mode: both;
@@ -580,11 +599,79 @@ ul.checkout-bar li.active:last-child::after{
   }
 }
 
+
+@-webkit-keyframes flash {
+  from, 50%, to {
+    opacity: 1;
+  }
+
+  25%, 75% {
+    opacity: 0;
+  }
+}
+
+@keyframes flash {
+  from, 50%, to {
+    opacity: 1;
+  }
+
+  25%, 75% {
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes pulse {
+  from {
+    -webkit-transform: scale3d(1, 1, 1);
+    transform: scale3d(1, 1, 1);
+  }
+
+  50% {
+    -webkit-transform: scale3d(1.05, 1.05, 1.05);
+    transform: scale3d(1.05, 1.05, 1.05);
+  }
+
+  to {
+    -webkit-transform: scale3d(1, 1, 1);
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+@keyframes pulse {
+  from {
+    -webkit-transform: scale3d(1, 1, 1);
+    transform: scale3d(1, 1, 1);
+  }
+
+  50% {
+    -webkit-transform: scale3d(1.05, 1.05, 1.05);
+    transform: scale3d(1.05, 1.05, 1.05);
+  }
+
+  to {
+    -webkit-transform: scale3d(1, 1, 1);
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+.pulse {
+  -webkit-animation-name: pulse;
+  animation-name: pulse;
+}
+
+
+.answer {
+  -webkit-animation-name: slideInLeft;
+  animation-name: slideInLeft;
+}
+
+/*
 .content {
   -webkit-animation-name: slideInLeft;
   animation-name: slideInLeft;
 }
 
+*/
 
 
 /* animation photo */
@@ -626,3 +713,8 @@ ul.checkout-bar li.active:last-child::after{
   transition-delay: 2s;
 }
 */
+
+
+ul.checkout-bar li.visited span {
+    background: #8BC53F none repeat scroll 0% 0%;
+}

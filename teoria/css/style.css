@@ -828,12 +828,45 @@ h2{
   }
 }
 
-.navigation-button, .btn-group .btn  {
+.navigation-button{
   -webkit-animation-name: tada;
   animation-name: tada;
 }
 
 
+
+@-webkit-keyframes fadeInDown {
+  from {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -100%, 0);
+    transform: translate3d(0, -100%, 0);
+  }
+
+  to {
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none;
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -100%, 0);
+    transform: translate3d(0, -100%, 0);
+  }
+
+  to {
+    opacity: 1;
+    -webkit-transform: none;
+    transform: none;
+  }
+}
+
+.btn-group .btn  {
+  -webkit-animation-name: fadeInDown;
+  animation-name: fadeInDown;
+}
 
 .btn-group .btn {
     display: inline-block;
