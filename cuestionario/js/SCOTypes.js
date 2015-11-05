@@ -6,21 +6,21 @@ var Question = (function($){
 	function Question(data){
 		self = this;
 		this.id = data.id;
-  	this.statement = data.statement;
-  	this.img = data.img;
-  	this.type = data.type;
-    this.answers = data.answers || [];
-    this.fails = 0;
-    this.totalTimeAllowed = data.totalTimeAllowed || 0;
-  	this.startTime = 0;
-    this.totalTime = 0;
-    this.$view = null;
+	  	this.statement = data.statement;
+	  	this.img = data.img;
+	  	this.type = data.type;
+	    this.answers = data.answers || [];
+	    this.fails = 0;
+	    this.totalTimeAllowed = data.totalTimeAllowed || 0;
+	  	this.startTime = 0;
+	    this.totalTime = 0;
+	    this.$view = null;
 	}
 
 	//Constantes de clase.
 	Question.QUESTION_TYPE_CHOICE = "choice";
-  Question.QUESTION_TYPE_TF = "true-false";
-  Question.QUESTION_TYPE_NUMERIC = "numeric";
+  	Question.QUESTION_TYPE_TF = "true-false";
+  	Question.QUESTION_TYPE_NUMERIC = "numeric";
 
 	Question.prototype._isEqual = function (answers1,answers2) {
 		  var equal = true;
@@ -99,18 +99,18 @@ var Question = (function($){
 
 		if (!$container.children("#"+this.id).length) {
 
-					var $question = $("<div>",{id:this.id}).append(
-						$("<figure>",{class:'figure'}).append(
-							$("<div>",{class:'photo'}).append(
-								$("<img>",{src:'imagenes/'+this.img})
-							),
-							$("<figcaption>",{class:'desc',text:this.statement})
-						),
-						$("<div>",{class:'answers'})
-					);
-					//Mostramos las respuestas.
-					this._renderAnswersTo($question);
-					this.$view = $question;
+			var $question = $("<div>",{id:this.id}).append(
+				$("<figure>",{class:'figure'}).append(
+					$("<div>",{class:'photo'}).append(
+						$("<img>",{src:'imagenes/'+this.img})
+					),
+					$("<figcaption>",{class:'desc',text:this.statement})
+				),
+				$("<div>",{class:'answers'})
+			);
+			//Mostramos las respuestas.
+			this._renderAnswersTo($question);
+			this.$view = $question;
         	//Mostramos la pregunta.
         	$container.children().hide().end().append($question);
 		}else{
@@ -173,25 +173,29 @@ var Test = (function($){
 	var scorm = pipwerks.SCORM;
 	var self = null;
 	var $checkoutBar = null;
+	var $table_result = null;
 
 	function Test(container,questions){
 		self = this;
 		this.questions = questions || [];
 		this.container = $("#"+container);
 		$checkoutBar = $("#checkout-bar");
+		$table_result = $("#result").hide();
 	}
 
 	var saveElapsedTime = function(){
+		var formattedTime = null,elapsedMiliSeconds;
 		if (startTimeStamp != 0 ){
 	      var currentTimestamp = new Date().getTime();
-	      var elapsedMiliSeconds = (currentTimestamp - startTimeStamp);
-	      var formattedTime = pipwerks.UTILS.convertTotalMiliSeconds(elapsedMiliSeconds);
+	      elapsedMiliSeconds = (currentTimestamp - startTimeStamp);
+	      formattedTime = pipwerks.UTILS.convertTotalMiliSeconds(elapsedMiliSeconds);
 	   }else{
 	      formattedTime = pipwerks.UTILS.convertTotalMiliSeconds(0);
 	   }
-
 	   scorm.SetSessionTime(formattedTime);
+	   return elapsedMiliSeconds;
 	}
+
 
 
 	var getBookMark = function(callback){
@@ -218,6 +222,7 @@ var Test = (function($){
         		}
         		typeof(callback) == "function" && callback(question);
         	});
+
         }else{
         	typeof(callback) == "function" && callback(question);
         }
@@ -315,37 +320,49 @@ var Test = (function($){
 		};
     }
 
-  //Inicia el test.
-  Test.prototype.start = function() {
-    //Creamos la barra de progreso.
-    createcheckoutBar();
-    //Iniciamos sesión de comunicación con el LMS.
-    scorm.init();
-    var status = scorm.GetCompletionStatus();
-    //it's a best practice to set the completion status to incomplete when
-    //first launching the course (if the course is not already completed)
-    if (status == "unknown"){
-        scorm.SetCompletionStatus("incomplete");
-    }
-    startTimeStamp = new Date();
-    //Mediante el valor de entry, sabremos si el usuario está iniciado la OCS por primera vez
-    // o si está retomando un intento previo.
-    var entry = scorm.data.get("cmi.core.entry");
-    if (entry == "resume") {
-        getBookMark(function(question){
-	      	if (question) {
-	        	self.goTo(question);
-		      }else{
-		        self.goTo(0);
-		      }
-        });
-    }else{
+  	//Inicia el test.
+  	Test.prototype.start = function() {
+	    //Creamos la barra de progreso.
+	    createcheckoutBar();
+	    //Iniciamos sesión de comunicación con el LMS.
+	    scorm.init();
+	    var status = scorm.GetCompletionStatus();
+	    //it's a best practice to set the completion status to incomplete when
+	    //first launching the course (if the course is not already completed)
+	    if (status == "unknown"){
+	        scorm.SetCompletionStatus("incomplete");
+	    }
+	    startTimeStamp = new Date();
+	    //Mediante el valor de entry, sabremos si el usuario está iniciado la OCS por primera vez
+	    // o si está retomando un intento previo.
+	    var entry = scorm.data.get("cmi.core.entry");
+	    if (entry == "resume") {
+	        getBookMark(function(question){
+		      	if (question) {
+		        	self.goTo(question);
+			      }else{
+			        self.goTo(0);
+			      }
+	        });
+	    }else{
+
+	    	var rules = "El test consta de " + self.questions.length + " preguntas, debes completar todas las preguntas para superar el test.";
+	    	rules += " Si el número de fallos cometidos en una pregunta es igual o superior al número de respuestas menos 1, la pregunta no puntua.";
+	    	rules += " Cada fallo restará del total (1 punto) su parte proporcional.";
+	    	swal({
+	    		title:"Información sobre el cuestionario",
+	    		text:rules,
+	    		type: "info"
+	    	});
 			self.goTo(0);
-    }
-  };
+	    }
+  	};
 	//Finaliza el test guardando puntuación.
 	Test.prototype.finish = function () {
 		var total_score = 0;
+		self.container.trigger("test_ended");
+		//Ocultamos barra de progreso.
+		$checkoutBar.hide();
 		//Obtiene el score de todas la preguntas.
 		self.questions.forEach(function(question){
 			total_score += question.getScore();
@@ -357,20 +374,27 @@ var Test = (function($){
 		var scaled_score = Math.round(total_score / self.questions.length * 100);
 		//Guardamos el score obtenido por el estudiante para este SCO.
 		scorm.SetScoreRaw(scaled_score);
+		scorm.SetSuccessStatus("passed");
+		var time = saveElapsedTime();
+		//Mostramos tabla de resultados.
+		$table_result.find("[data-questions]").text(self.questions.length);
+		$table_result.find("[data-score]").text(scaled_score + "%");
+		$table_result.find("[data-time]").text(Math.round(time/1000/60) + " Minutos");
+		$table_result.show();
+
 		swal({
 			title: "Test Finalizado!",
 			text: "Felicidades, has finalizado el test con una puntación de : " + scaled_score + "%",
 			imageUrl: "imagenes/thumbs-up.jpg"
 		});
-		self.container.trigger("test_ended");
-		scorm.SetSuccessStatus("passed");
-		saveElapsedTime();
+		
+		
 		scorm.save();
 		scorm.quit();
 	};
 
 	//Permite salir del test guardando el estado.
-  Test.prototype.exit = function() {
+  	Test.prototype.exit = function() {
 		swal({
 				title: "¿Estás seguro?",
 				text: "¿Quieres salir del objeto de aprendizaje?",
