@@ -177,7 +177,7 @@
 				},
 				{
 					id:2,
-					text:'Está rota la placa de identifiacion de los seccionadores y falta el soporte posapies. Comunicará las deficiencias, a su responsable directo, para subsanarlas.',
+					text:'Está rota la placa de identificación de los seccionadores y falta el soporte posa pies. Comunicará las deficiencias, a su responsable directo, para subsanarlas.',
 					feedback:'El recurso preventivo debe comunicar las deficiencias de placa de identificación y el soporte posapies a su responsable para subsanarlas.',
 					correct:true
 				},
@@ -189,7 +189,7 @@
 				},
 				{
 					id:4,
-					text:'Esta rota la placa de identifiacion de los seccionadores y falta el soporte posapies. ',
+					text:'Esta rota la placa de identificación de los seccionadores y falta el soporte posapies. ',
 					feedback:'El recurso preventivo debe comunicar las deficiencias de placa de identificación y el soporte posapies a su responsable para subsanarlas.',
 					correct:false
 				}
@@ -206,19 +206,19 @@
 					id:1,
 					text:'No, debido a que el equipo esta compuesto por dos trabajadores que se ayudan mutuamente.',
 					feedback:'Existen riesgos de descargas por contacto eléctrico AT.',
-					correct:0
+					correct:false
 				},
 				{
 					id:2,
 					text:'Sí',
 					feedback:'Es debido a que hay riesgos de descargas por contacto eléctrico AT.',
-					correct:1
+					correct:true
 				},
 				{
 					id:3,
 					text:'No.',
 					feedback:'Existen riesgos de descargas por contacto eléctrico AT.',
-					correct:0
+					correct:false
 				}
 			]
 		}));
@@ -397,7 +397,7 @@
 				},
 				{
 					id:2,
-					text:'Al trabajador. Recomendándole que utilice un elemento aislante adcuado: Tela vinílica.',
+					text:'Al trabajador. Recomendándole que utilice un elemento aislante adecuado: Tela vinílica.',
 					feedback:'Es función del recurso preventivo advertir al trabajador sobre los materiales más adecuados para trabajar.',
 					correct:true
 				}
@@ -418,7 +418,7 @@
 				},
 				{
 					id:2,
-					text:'Al ver que utiliza una herramineta que no está aislada.',
+					text:'Al ver que utiliza una herramienta que no está aislada.',
 					feedback:'Es función del recurso preventivo advertir al trabajador sobre los materiales más adecuados para trabajar.',
 					correct:true
 				}
@@ -433,7 +433,7 @@
 			answers:[
 				{
 					id:1,
-					text:'Al trabajor, recomendándole el uso de herramientas aisladas.',
+					text:'Al trabajador, recomendándole el uso de herramientas aisladas.',
 					feedback:'Es función del recurso preventivo advertir al trabajador sobre los materiales más adecuados para trabajar.',
 					correct:true
 				},
